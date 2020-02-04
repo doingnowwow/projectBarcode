@@ -1,17 +1,19 @@
 package com.hanseon;
 
-import java.awt.Font;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.onbarcode.barcode.DataMatrix;
 import com.onbarcode.barcode.EAN128;
@@ -34,40 +36,48 @@ public class TestController {
 	
 	
 	@RequestMapping("/genBarcode")
-	//public void generate(  HttpServletRequest request) {
-	public String generate(@RequestParam String fullBarcode  ) {
+	@ResponseBody
+	public String generate(  HttpServletRequest request)  throws Exception{
+//	public String generate(@RequestParam String fullBarcode  )  throws Exception{
 		
-//	String fullBarcode = request.getParameter("fullBarcode");	
+	String fullBarcode = request.getParameter("fullBarcode");	
+		/*
+		 * byte separator = 0x1D; byte fncst = (byte) 0xE8;
+		 * 
+		 * String sss= fullBarcode.split("01")[0];
+		 * 
+		 * System.out.println(sss);
+		 */
+	
+	
+		/*
+		 * BarcodeData bar =new BarcodeData();
+		 * 
+		 * bar.setBarcode("08809877654321"); bar.setName("비타민");
+		 * 
+		 * 
+		 * bar.getBarcode(); bar.getName();
+		 * 
+		 * ArrayList< BarcodeData > barList = new ArrayList<BarcodeData>();
+		 * barList.add(bar); barList.add(bar1); barList.add(bar2); barList.add(bar3);
+		 * barList.add(bar4);
+		 * 
+		 */
+			
+			
+	
+	String result = fullBarcode;
 //	request.setAttribute(name, o);
 	
-	DataMatrix Dbarcode = new DataMatrix();
+		DataMatrix Dbarcode = new DataMatrix();
 		
-		/*
-		   Data Matrix Valid data char set:
-		        ASCII values 0 - 127 in accordance with the US national version of ISO/IEC 646
-		            ASCII values 128 - 255 in accordance with ISO 8859-1. These are referred to as extended ASCII.
-		
-		*/
 		Dbarcode.setData(fullBarcode);
 		
-		
 		Dbarcode.setDataMode(DataMatrix.M_AUTO);
-		
-		// if your selected format mode doesnot have enough space to encode your data,
-		// the library will choose the right format mode for you automatically.
+
 		Dbarcode.setFormatMode(DataMatrix.F_10X10);
-		
-		//  Set the processTilde property to true, if you want use the tilde character "~" to specify special characters in the input data. Default is false.
-		//  1-byte character: ~ddd (character value from 0 ~ 255)
-		//  ASCII (with EXT): from ~000 to ~255
-		//  2-byte character: ~6ddddd (character value from 0 ~ 65535)
-		//  Unicode: from ~600000 to ~665535
-		//  ECI: from ~7000000 to ~7999999
 		Dbarcode.setProcessTilde(true);
-		
-		// Data Matrix Unit of Measure, pixel, cm, or inch
 		Dbarcode.setUom(IBarcode.UOM_PIXEL);
-		// Data Matrix barcode bar module width (X) in pixel
 		Dbarcode.setX(3f);
 		
 		Dbarcode.setLeftMargin(10f);
@@ -87,27 +97,18 @@ public class TestController {
 		System.out.println("데이터 매트릭스 바코드 생성 완료");
 		
 		// 초기화면으로
-	return "redirect:/home";
+	return result;
 	
 		
 		
 		
-// 1차원바코듣생성하기		
+// 1차원바코드생성하기		
 //		 EAN128 barcode = new EAN128();
 //			
 //			
 //			barcode.setData(fullBarcode);
 //			
-//			//  Set the processTilde property to true, if you want use the tilde character "~"
-//			//  to specify special characters in the input data. Default is false.
-//			//  1) All 128 ISO/IEC 646 characters, i.e. characters 0 to 127 inclusive, in accordance with ISO/IEC 646.
-//			//       NOTE This version consists of the G0 set of ISO/IEC 646 and the C0 set of ISO/IEC 6429 with values 28 - 31
-//			//       modified to FS, GS, RS and US respectively.
-//			//  2) Characters with byte values 128 to 255 may also be encoded.
-//			//  3) 4 non-data function characters.
-//			//  4) 4 code set selection characters.
-//			//  5) 3 Start characters.
-//			//  6) 1 Stop character.
+//	
 //			barcode.setProcessTilde(true);
 //			
 //			// GS1-128 Unit of Measure, pixel, cm, or inch
@@ -142,8 +143,9 @@ public class TestController {
 //				e.printStackTrace();
 //			}
 //			System.out.println("생성완료ㅋ");
-			
-		
+//			
+//		
+//			return "redirect:/home";
 	}
 	
 	
@@ -152,11 +154,19 @@ public class TestController {
 	public void error() {}
 
 	@RequestMapping("/print")
-	public String print(@RequestParam String barcodeInput) throws Exception {
+	@ResponseBody
+	public void print(@RequestParam String barcodeInput, HttpServletRequest request) throws Exception {
+		
+		
+		//파라미터값 가져오기
+		String gs1code = request.getParameter("gs1code");
+		String expireIn = request.getParameter("expireIn");
+		String lineNumIn = request.getParameter("lineNumIn");
+		String serialNumIn = request.getParameter("serialNumIn");
 
 		// 파일가져오기
-		//1차원 바코드
-		ClassPathResource resource = new ClassPathResource("barcode1.prn");
+		//2차원 데이터매트릭스
+		ClassPathResource resource = new ClassPathResource("hihi.prn");
 		//2차원 데이터매트릭스
 //		ClassPathResource resource = new ClassPathResource("datamatrix.prn");
 
@@ -195,7 +205,9 @@ public class TestController {
 			
 
 			// 입력할 바코드값 바꾸기
-			String ffff = total.replace("*************", barcode);
+	//		String ffff = total.replace("*************", barcode);
+			String ffff = total.replace("**************", gs1code).replace("******", expireIn).replace("********************", lineNumIn).replace("vvvvvvvvvvvvvvvvvvvv", serialNumIn);
+			
 			System.out.println(ffff);
 
 			// 바코드 바이트로 가져오기
@@ -240,7 +252,7 @@ public class TestController {
 			connection.close();
 		}
 		// 초기화면으로
-		return "redirect:/home";
+//		return "redirect:/home";
 
 	}
 

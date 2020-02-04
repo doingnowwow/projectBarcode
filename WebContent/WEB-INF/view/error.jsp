@@ -133,7 +133,7 @@ body {
 		<div class="notfound">
 			<div class="notfound-404">
 				<h1>Oops!</h1>
-				<h2>ERROR!!!!- The Page can't be found</h2>
+				<h2>ERROR!!!!- just error_404,500</h2>
 			</div>
 			<a href="${pageContext.request.contextPath }/home">Go TO Homepage</a>
 		</div>

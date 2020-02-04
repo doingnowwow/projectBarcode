@@ -13,7 +13,7 @@ public class FileTest {
 	public static void main(String[] args) throws Exception {
 
 		// resource에 있는 파일가져오기
-		ClassPathResource resource = new ClassPathResource("datamatrix.prn");
+		ClassPathResource resource = new ClassPathResource("hihi.prn");
 
 		String filename = resource.getFilename();
 
@@ -39,8 +39,7 @@ public class FileTest {
 			}
 			System.out.println("///////////////////");
 			System.out.println(total);
-			System.out.println("````````````````````````````````");
-			String ffff = total.replace("*************", "08809566300010");
+			String ffff = total.replace("**************", "08809566300010").replace("******", "200202").replace("********************", "DD1123").replace("vvvvvvvvvvvvvvvvvvvv", "CC123");
 			System.out.println(ffff);
 
 		} catch (IOException e) {
