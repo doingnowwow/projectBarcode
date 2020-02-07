@@ -60,7 +60,7 @@
 				return false;
 			}
 			$(location).attr('href','${pageContext.request.contextPath}/search?inputBarcode='+inputBarcode);
-				alert(inputBarcode);
+				//alert(inputBarcode);
 			
 		})
 		
@@ -68,7 +68,7 @@
 	
 		if(gtincode.length>0){
 			$('select[name=gs1] option[value='+gtincode+']').attr('selected',true);
-			alert(gtincode);
+			//alert(gtincode);
 			
 		}
 		
@@ -118,7 +118,7 @@
 				    //바코드생성하는 메서드로 ㄱㄱ
 		
 			   var fullBarcode = "01"+gs1code+"17"+expireIn+"10"+lineNumIn+"21"+serialNumIn;
-				   alert("유효기간입력 : "+expireIn+"제품제조번호  : "+lineNumIn + "제품일련번호 : " + serialNumIn);
+			//	   alert("유효기간입력 : "+expireIn+"제품제조번호  : "+lineNumIn + "제품일련번호 : " + serialNumIn);
 						
 					 	 $.ajax({
 							
