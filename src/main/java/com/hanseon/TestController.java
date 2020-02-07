@@ -10,10 +10,12 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.onbarcode.barcode.DataMatrix;
 import com.onbarcode.barcode.EAN128;
@@ -34,7 +36,12 @@ public class TestController {
 	}
 	
 	
-	
+	/**
+	 * full 바코드를 생성하기 위해 ajax 통신하는 메서드
+	 * @param request : fullbarcode 생성하기 위해 jsp 에서 값 보내주는 
+	 * @return
+	 * @throws Exception
+	 */
 	@RequestMapping("/genBarcode")
 	@ResponseBody
 	public String generate(  HttpServletRequest request)  throws Exception{
@@ -63,23 +70,18 @@ public class TestController {
 		 * barList.add(bar4);
 		 * 
 		 */
-			
-			
 	
-	String result = fullBarcode;
-//	request.setAttribute(name, o);
+		String result = fullBarcode;
 	
 		DataMatrix Dbarcode = new DataMatrix();
-		
 		Dbarcode.setData(fullBarcode);
-		
 		Dbarcode.setDataMode(DataMatrix.M_AUTO);
-
 		Dbarcode.setFormatMode(DataMatrix.F_10X10);
 		Dbarcode.setProcessTilde(true);
 		Dbarcode.setUom(IBarcode.UOM_PIXEL);
 		Dbarcode.setX(3f);
 		
+		//margin 주는거
 		Dbarcode.setLeftMargin(10f);
 		Dbarcode.setRightMargin(10f);
 		Dbarcode.setTopMargin(10f);
@@ -93,76 +95,29 @@ public class TestController {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
 		System.out.println("데이터 매트릭스 바코드 생성 완료");
 		
-		// 초기화면으로
-	return result;
-	
-		
-		
-		
-// 1차원바코드생성하기		
-//		 EAN128 barcode = new EAN128();
-//			
-//			
-//			barcode.setData(fullBarcode);
-//			
-//	
-//			barcode.setProcessTilde(true);
-//			
-//			// GS1-128 Unit of Measure, pixel, cm, or inch
-//			barcode.setUom(IBarcode.UOM_PIXEL);
-//			// GS1-128 barcode bar module width (X) in pixel
-//			barcode.setX(3f);
-//			// GS1-128 barcode bar module height (Y) in pixel
-//			barcode.setY(75f);
-//			
-//			// barcode image margins
-//			barcode.setLeftMargin(0f);
-//			barcode.setRightMargin(0f);
-//			barcode.setTopMargin(0f);
-//			barcode.setBottomMargin(0f);
-//			
-//			// barcode image resolution in dpi
-//			barcode.setResolution(72);
-//			
-//			// disply barcode encoding data below the barcode
-//			barcode.setShowText(true);
-//			// barcode encoding data font style
-//			barcode.setTextFont(new Font("Arial", 0, 12));
-//			// space between barcode and barcode encoding data
-//			barcode.setTextMargin(6);
-//			
-//			//  barcode displaying angle
-//			barcode.setRotate(IBarcode.ROTATE_0);
-//			
-//			try {
-//				barcode.drawBarcode("D:\\images\\barcode.gif");
-//			} catch (Exception e) {
-//				e.printStackTrace();
-//			}
-//			System.out.println("생성완료ㅋ");
-//			
-//		
-//			return "redirect:/home";
+		return result;
+
 	}
 	
 	
 	
-	@RequestMapping("error")
-	public void error() {}
-
+	/**
+	 * 라벨로 프린터 하기 위해 ajax 통신을 위한 메서드
+	 * 
+	 * @param request
+	 * @throws Exception
+	 */
 	@RequestMapping("/print")
 	@ResponseBody
-	public void print(@RequestParam String barcodeInput, HttpServletRequest request) throws Exception {
+	public void print(HttpServletRequest request) throws Exception {
 		
-		
-		//파라미터값 가져오기
-		String gs1code = request.getParameter("gs1code");
-		String expireIn = request.getParameter("expireIn");
-		String lineNumIn = request.getParameter("lineNumIn");
-		String serialNumIn = request.getParameter("serialNumIn");
+	//파라미터값 가져오기
+	String gs1code = request.getParameter("gs1code");
+	String expireIn = request.getParameter("expireIn");
+	String lineNumIn = request.getParameter("lineNumIn");
+	String serialNumIn = request.getParameter("serialNumIn");
 
 		// 파일가져오기
 		//2차원 데이터매트릭스
@@ -197,17 +152,8 @@ public class TestController {
 				System.out.println(s);
 			}
 			
-			//14자리로 만들기
-			//GTIN의 (01)을 사용하려면 14자리여야함. 그래서 14자리 아닐경우 맞춰주기 (16byte)
-			// int는 4byte 10자리  -2,147,483,648 ~ 2,147,483,647
-
-			String barcode = String.format("%014d",Long.parseLong(barcodeInput));
-			
-
 			// 입력할 바코드값 바꾸기
-	//		String ffff = total.replace("*************", barcode);
-			String ffff = total.replace("**************", gs1code).replace("******", expireIn).replace("********************", lineNumIn).replace("vvvvvvvvvvvvvvvvvvvv", serialNumIn);
-			
+			String ffff = total.replace("**************", gs1code).replace("zzz", expireIn).replace("###", lineNumIn).replace("vvvvvvvvvvvvvvvvvvvv", serialNumIn);
 			System.out.println(ffff);
 
 			// 바코드 바이트로 가져오기
@@ -226,6 +172,7 @@ public class TestController {
 
 		// 프린터연결
 		Connection connection = new TcpConnection("192.168.1.154", TcpConnection.DEFAULT_ZPL_TCP_PORT);
+		
 		try {
 			connection.open();
 			ZebraPrinter zPrinter = ZebraPrinterFactory.getInstance(connection);
@@ -237,13 +184,12 @@ public class TestController {
 			// connection.write(resource.getInputStream());
 			
 			// Byte로 읽어서 출력하기
-		//	 connection.write(buffers);
-
+			 connection.write(buffers);
 			System.out.println("인쇄중임ㅋ.....");
-
+			
 			connection.close();
-
 			System.out.println("연결해제.");
+			
 		} catch (ConnectionException e) {
 			e.printStackTrace();
 		} catch (ZebraPrinterLanguageUnknownException e) {
@@ -251,9 +197,43 @@ public class TestController {
 		} finally {
 			connection.close();
 		}
-		// 초기화면으로
-//		return "redirect:/home";
-
 	}
+
+	
+	@RequestMapping("/search")
+	public ModelAndView searchBarcode(ModelAndView andView,@RequestParam String inputBarcode) {
+		
+		System.out.println("넘어옴");
+		//01/08806469007114/17/200131/10/010101/21/a4545
+		//010880999999999717180131.1014001.2100000014
+		 CharSequence gs = Character.toString((char) 29);
+		 System.out.println("contains gs ? " + inputBarcode.contains(gs));
+		
+		System.out.println(inputBarcode);
+		
+		System.out.println("---------------------");
+		System.out.println(inputBarcode.length());
+		BarcodeVO vo = new BarcodeVO();
+		
+		
+		vo.setGs1code(inputBarcode.substring(0,16));
+		vo.setExpire(inputBarcode.substring(16,24));
+		
+//		vo.setlNum(inputBarcode.split((String) gs));
+		
+		vo.setlNum(inputBarcode.substring(26,31));
+		vo.setsNum(inputBarcode.substring(34));
+		
+		andView.addObject("zz",vo);
+		andView.addObject("msg","나가세요");
+		
+		andView.setViewName("/home");
+		
+		System.out.println("dd");
+		return andView;
+	}
+	
+	@RequestMapping("error")
+	public void error() {}
 
 }
